@@ -14,6 +14,7 @@ import PageNotFound from './components/NotFound/NotFound';
 import GamesList from './components/GamesList/GamesList';
 import { useEffect, useState, createContext } from 'react';
 import Game from './components/Game/Game';
+import Stats from './components/Stats/Stats'
 
 
 const UserContext = createContext()
@@ -44,7 +45,7 @@ function App() {
   //   return JSON.parse(jsonPayload);
   // }
   
-  const checkAccessTokenValidity = async (token) => {
+  const checkRefreshTokenValidity = async (token) => {
     if(!token) {
       console.log("there's no token provided")
       return false;
@@ -72,7 +73,7 @@ function App() {
   useEffect(() => {
     (async () => {
     let token = localStorage.getItem('jwt-refresh')
-    let isValid = await checkAccessTokenValidity(token)
+    let isValid = await checkRefreshTokenValidity(token)
     setLogIn(isValid);
     })()
   }, []);
@@ -88,10 +89,12 @@ function App() {
             <Routes>
               <Route path="/" element={ <Navigate to="/games" /> }/>
               <Route path="/games" element={<GamesList />} />
-              <Route path="/signin" element={isLoggedIn ? <Navigate to="/games" /> : <SignIn markAsLoggedIn={markAsLoggedIn}/>}></Route>
-              <Route path="/signup" element={isLoggedIn ? <Navigate to="/games" /> : <SignUp />}></Route>
-              <Route path="/*" element={<PageNotFound />}></Route>
-              <Route path="game/:game_id" element={<Game />} />
+              <Route path="/signin" element={isLoggedIn ? <Navigate to="/games" /> : <SignIn markAsLoggedIn={markAsLoggedIn}/>} />
+              <Route path="/signup" element={isLoggedIn ? <Navigate to="/games" /> : <SignUp />} />
+              <Route path="/*" element={<PageNotFound />} />
+              {/* <Route path="/games/  requires_login_or_does_not_exist" element={<RequiresLogin />}/> */}
+              <Route path="game/:creator_id/:game_id" element={<Game />} />
+              <Route path="/stats" element={<Stats />} />
             </Routes>
           </BrowserRouter>
         </Box>

@@ -168,6 +168,8 @@ export default function MiniDrawer({ isLoggedIn, markAsLoggedOut }) {
             </ListItem>
           <ListItem disablePadding sx={{ display: 'block' }}>
           <ListItemButton
+            component={RouterLink}
+            to="/stats"
             sx={{
               minHeight: 48,
               justifyContent: open ? 'initial' : 'center',

@@ -14,13 +14,19 @@ import GarageIcon from '@mui/icons-material/Garage';
 import SportsScoreIcon from '@mui/icons-material/SportsScore';
 import { UserContext } from '../../App';
 
+import {
+  Link as RouterLink
+} from "react-router-dom";
+
+
 export default function GamesList() {
   const [gamesList, setGamesList] = useState([]);
 
   const {isLoggedIn, markAsLoggedIn, markAsLoggedOut} = useContext(UserContext)
 
-  const createGame = () => {
-    fetch('/api/races/race/create/', {
+  const createGame = async (e) => {
+    e.preventDefault()
+     await fetch('/api/races/race/create/', {
       method: 'POST',
       headers: {
         "Content-Type": "application/json",
@@ -80,6 +86,16 @@ export default function GamesList() {
     .then(json_data => {
       console.log(json_data)
     })
+
+    await fetch('/api/races/available/')
+    .then((res) => res.json())
+    .then((data) => {
+        console.log(data);
+        setGamesList(data);
+    })
+    .catch((err) => {
+        console.log(err.message);
+    });
   }
 
   useEffect(() => {
@@ -92,7 +108,6 @@ export default function GamesList() {
     .catch((err) => {
         console.log(err.message);
     });
-      //setGamesList([{creator: "Ilya", id: "KJKSAD8979"}, {creator: "Gamers", id: "DJHFSK80980"}])
   }, []);
 
   
@@ -100,10 +115,11 @@ export default function GamesList() {
   return (
     <Box sx={{m: '2rem', width: '100%', display: 'flex', alignItems: 'stretch'}}>
       <List 
-        sx={{p: 0, border: 1, borderColor: 'rgba(0, 0, 0, 0.12)', maxWidth: '1100px', width: '100%', bgcolor: 'background.paper'}}
+        sx={{p: 0, border: 1, borderColor: 'rgba(0, 0, 0, 0.12)', maxWidth: '1100px', width: '100%', bgcolor: 'background.paper', overflow: 'auto'}}
         subheader={
           <>
-           <ListSubheader /* component="h1" */ id="nested-list-subheader" sx={{ width: '100%', display: 'flex', justifyContent: 'space-between'}}> 
+           <ListSubheader /* component="h1" */ sx={{ width: '100%', /*display: 'flex', justifyContent: 'space-between'*/}}> 
+           <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between'}}>
             <h4>Available games</h4>
             {
             isLoggedIn
@@ -119,20 +135,22 @@ export default function GamesList() {
             </Button> 
             :
             ''}
+            </Box>
+            <Divider sx={{width: "100% + 2rem", ml: "-1rem", mr: "-1rem"}}/>
           </ListSubheader>
-          <Divider />
           </>
         }
       >
 
-        {gamesList.map((race, i) => (
-          <ListItemButton key={i} divider>
+        {gamesList.map((race) => (
+          <ListItemButton key={race.id} component={RouterLink} to={`/game/${race.creator.id}/${race.id}`} divider>
             <ListItemAvatar>
               <Avatar>
                 <SportsScoreIcon />
               </Avatar>
             </ListItemAvatar>
-            <ListItemText primary={race.creator} secondary={race.id} />
+            <ListItemText primary={race.creator.username} secondary={race.id} />
+            <ListItemText secondary={`Players: ${race.amount_of_players}`} sx={{textAlign: 'right'}} />
           </ListItemButton>
         ))}
       </List>
